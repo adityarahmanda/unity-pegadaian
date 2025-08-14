@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -15,6 +16,11 @@ namespace LZY.SimpleActionSequence
         public Coroutine ExecuteSequence()
         {
             return sequence.ExecuteSequence();
+        }
+        
+        public async Task ExecuteSequenceAsync()
+        {
+            await sequence.ExecuteSequenceAsync();
         }
 
         [Button]

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace LZY.SimpleActionSequence
@@ -19,10 +20,19 @@ namespace LZY.SimpleActionSequence
             return _playCoroutineSequence;
         }
 
+        public async Task ExecuteSequenceAsync()
+        {
+            StopSequence();
+            _playCoroutineSequence = CoroutineRunner.StartNewCoroutine(ExecuteSequenceCoroutine());
+            while (_playCoroutineSequence != null)
+                await Task.Yield();
+        }
+
         public void StopSequence()
         {
             if (_playCoroutineSequence != null)
                 CoroutineRunner.StopRunningCoroutine(_playCoroutineSequence);
+            _playCoroutineSequence = null;
         }
 
         private IEnumerator ExecuteSequenceCoroutine()
@@ -41,6 +51,8 @@ namespace LZY.SimpleActionSequence
                 else if (action is IActionWaitable waitableAction)
                     yield return new WaitUntil(() => waitableAction.IsDoneWaiting);
             }
+
+            _playCoroutineSequence = null;
         }
         
         public T GetActionSequence<T>() where T : SequenceAction => actionList.OfType<T>().FirstOrDefault();
